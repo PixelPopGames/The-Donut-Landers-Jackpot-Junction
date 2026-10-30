@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Donut Landers: Sugar Rush - Neon Slot Machine</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neonPink: '#ff007f',
+                        neonCyan: '#00f3ff',
+                        neonYellow: '#ffe600',
+                        neonGreen: '#00ff66',
+                        neonPurple: '#9d00ff',
+                        darkCabinet: '#0f051d'
+                    },
+                    fontFamily: {
+                        display: ['Impact', 'Trebuchet MS', 'sans-serif'],
+                        digital: ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Neon Animations and Slot Cabinet Styling */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px #ff007f, inset 0 0 15px #ff007f; }
+            50% { box-shadow: 0 0 30px #00f3ff, inset 0 0 25px #00f3ff; }
+        }
+
+        @keyframes bulbBlink {
+            0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 2px currentColor); }
+            50% { opacity: 1; filter: drop-shadow(0 0 12px currentColor); }
+        }
+
+        .cabinet-frame {
+            background: radial-gradient(circle at top, #2a0845 0%, #0c021a 80%);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 127, 0.4),
+                0 20px 40px rgba(0, 0, 0, 0.9),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.8);
+            border: 4px solid #3b115a;
+        }
+
+        .neon-border {
+            border: 3px solid #ff007f;
+            box-shadow: 0 0 15px #ff007f, inset 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+
+        .neon-border-cyan {
+            border: 3px solid #00f3ff;
+            box-shadow: 0 0 15px #00f3ff, inset 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .bulb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            animation: bulbBlink 1.2s infinite ease-in-out;
+        }
+
+        /* Glass reflection overlay for slot viewport */
+        .glass-reflection {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.03) 40%,
+                transparent 40.1%,
+                transparent 100%
+            );
+            pointer-events: none;
+        }
+
+        /* LED Display font style */
+        .led-screen {
+            background-color: #08020f;
+            color: #ff3366;
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 8px #ff0055;
+            box-shadow: inset 0 0 10px #000000;
+        }
+
+        .spin-btn-neon {
+            background: linear-gradient(180deg, #00ffff 0%, #0088cc 100%);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px #00f3ff, 0 8px 0 #005588, inset 0 2px 4px rgba(255,255,255,0.8);
+            transition: all 0.1s ease;
+        }
+
+        .spin-btn-neon:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px #00f3ff, 0 10px 0 #005588, inset 0 2px 6px rgba(255,255,255,0.9);
+        }
+
+        .spin-btn-neon:active:not(:disabled) {
+            transform: translateY(6px);
+            box-shadow: 0 0 15px #00f3ff, 0 2px 0 #005588, inset 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .spin-btn-neon:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.6);
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #005588;
+        }
+
+        /* Reel animation container */
+        .reel-window {
+            perspective: 1000px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #111 0%, #fff 50%, #111 100%);
+        }
+
+        .reel-strip {
+            will-change: transform;
+            transform: translateY(0px);
+        }
+
+        .winning-cell {
+            animation: winPulse 0.6s infinite alternate;
+            z-index: 20;
+        }
+
+        @keyframes winPulse {
+            0% { transform: scale(0.95); filter: drop-shadow(0 0 5px #ffe600); }
+            100% { transform: scale(1.1); filter: drop-shadow(0 0 20px #ffe600); }
+        }
+
+        /* SVG Line Canvas for Paylines */
+        #payline-canvas {
+            pointer-events: none;
+            z-index: 30;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col justify-between items-center font-sans antialiased selection:bg-neonPink selection:text-white">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="w-full max-w-4xl mx-auto p-2 sm:p-4 flex flex-col items-center">
+
+        <!-- 1. SPLASH SCREEN (5-Second Startup) -->
+        <div id="splash-screen" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
+            <div class="cabinet-frame neon-border p-8 rounded-3xl max-w-md w-full text-center flex flex-col items-center">
+                <!-- Square Splash Logo SVG -->
+                <div class="w-32 h-32 mb-6 animate-bounce">
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_15px_#ff007f]">
+                        <circle cx="50" cy="50" r="45" fill="#1a0033" stroke="#ff007f" stroke-width="4"/>
+                        <circle cx="50" cy="50" r="28" fill="#ffe600" stroke="#00f3ff" stroke-width="3"/>
+                        <circle cx="50" cy="50" r="12" fill="#1a0033"/>
+                        <polygon points="50,10 60,35 88,35 65,52 74,78 50,62 26,78 35,52 12,35 40,35" fill="#ff007f" opacity="0.6"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-neonPink via-neonYellow to-neonCyan tracking-wider mb-1">
+                    THE DONUT LANDERS
+                </h1>
+                <h2 class="text-xl font-bold text-neonCyan tracking-widest mb-6">SUGAR RUSH</h2>
+                
+                <div class="w-full bg-gray-900 h-4 rounded-full overflow-hidden border border-neonPink/50 mb-3">
+                    <div id="loading-bar" class="h-full bg-gradient-to-r from-neonPink via-neonYellow to-neonCyan w-0 transition-all duration-75"></div>
+                </div>
+                <p id="splash-status" class="text-xs text-gray-400 font-digital uppercase tracking-widest">Powering Neon Reels...</p>
+            </div>
+        </div>
+
+        <!-- MAIN MENU SCREEN -->
+        <div id="main-menu-screen" class="hidden w-full flex flex-col items-center justify-center min-h-[85vh]">
+            <div class="cabinet-frame neon-border p-6 sm:p-8 rounded-3xl max-w-xl w-full text-center">
+                <div class="mb-6 flex justify-center">
+                    <!-- Rectangular Logo SVG -->
+                    <svg viewBox="0 0 400 100" class="w-full max-w-md h-auto drop-shadow-[0_0_20px_#00f3ff]">
+                        <rect x="5" y="5" width="390" height="90" rx="15" fill="#11052c" stroke="#00f3ff" stroke-width="4"/>
+                        <text x="200" y="45" text-anchor="middle" fill="#ff007f" font-family="Impact" font-size="34" letter-spacing="2">THE DONUT LANDERS</text>
+                        <text x="200" y="78" text-anchor="middle" fill="#ffe600" font-family="Impact" font-size="28" letter-spacing="4">SUGAR RUSH</text>
+                    </svg>
+                </div>
+
+                <h3 class="text-lg font-bold text-neonCyan mb-4 tracking-wider uppercase">Select Level Progression (1 - 12)</h3>
+                <div id="level-select-grid" class="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-8">
+                    <!-- Levels generated via JavaScript -->
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="btn-start-game" class="spin-btn-neon px-8 py-3 rounded-full text-xl font-display font-black tracking-wider text-black">
+                        PLAY SLOT CABINET
+                    </button>
+                    <button id="btn-workshop-menu" class="bg-purple-900/80 hover:bg-purple-800 border-2 border-neonPink text-neonPink font-bold px-6 py-3 rounded-full transition-all hover:shadow-[0_0_15px_#ff007f]">
+                        SYMBOL WORKSHOP
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SLOT MACHINE CABINET INTERFACE -->
+        <div id="game-screen" class="w-full flex flex-col items-center my-auto">
+
+            <!-- MAIN CABINET WRAPPER -->
+            <div class="cabinet-frame rounded-3xl p-3 sm:p-5 w-full max-w-3xl relative flex flex-col items-center border-4 border-purple-950 shadow-2xl">
+                
+                <!-- TOP MARQUEE LIGHT BULBS (Flashing Neon Bulbs) -->
+                <div class="w-full flex justify-between items-center px-4 py-2 bg-black/60 rounded-t-2xl border-b border-purple-900/50 mb-3">
+                    <div class="bulb bg-neonPink text-neonPink" style="animation-delay: 0.1s;"></div>
+                    <div class="bulb bg-neonYellow text-neonYellow" style="animation-delay: 0.3s;"></div>
+                    <div class="bulb bg-neonGreen text-neonGreen" style="animation-delay: 0.5s;"></div>
+                    <div class="bulb bg-neonCyan text-neonCyan" style="animation-delay: 0.7s;"></div>
+                    <div class="bulb bg-neonPurple text-neonPurple" style="animation-delay: 0.9s;"></div>
+                    <div class="bulb bg-neonPink text-neonPink" style="animation-delay: 0.2s;"></div>
+                    <div class="bulb bg-neonYellow text-neonYellow" style="animation-delay: 0.4s;"></div>
+                    <div class="bulb bg-neonGreen text-neonGreen" style="animation-delay: 0.6s;"></div>
+                    <div class="bulb bg-neonCyan text-neonCyan" style="animation-delay: 0.8s;"></div>
+                </div>
+
+                <!-- 1. COMPACT LED SCORE BOARD & MINI CONTROLS -->
+                <div class="w-full bg-black/90 border-2 border-neonPink rounded-xl p-2.5 mb-3 flex flex-wrap sm:flex-nowrap justify-between items-center gap-2 shadow-[inset_0_0_15px_rgba(255,0,127,0.3)]">
+                    
+                    <!-- LED STATS METERS -->
+                    <div class="flex items-center gap-2 sm:gap-4 flex-1 justify-around">
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-neonYellow tracking-wider">CREDITO</span>
+                            <div id="ui-credits" class="led-screen px-2.5 py-1 rounded text-sm sm:text-base font-bold min-w-[75px] text-center">1000</div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-neonGreen tracking-wider">PRÊMIO</span>
+                            <div id="ui-win" class="led-screen px-2.5 py-1 rounded text-sm sm:text-base font-bold min-w-[65px] text-center text-neonGreen shadow-[0_0_8px_#00ff66]">0</div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-neonCyan tracking-wider">APOSTA</span>
+                            <div id="ui-bet" class="led-screen px-2.5 py-1 rounded text-sm sm:text-base font-bold min-w-[60px] text-center text-neonCyan shadow-[0_0_8px_#00f3ff]">10</div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-neonPink tracking-wider">LEVEL</span>
+                            <div id="ui-level" class="led-screen px-2.5 py-1 rounded text-sm sm:text-base font-bold min-w-[45px] text-center text-neonPink shadow-[0_0_8px_#ff007f]">1</div>
+                        </div>
+                    </div>
+
+                    <!-- COMPACT CONTROLS IN HEADER -->
+                    <div class="flex items-center gap-1.5 border-l border-purple-800/80 pl-2">
+                        <button id="btn-bet-minus" class="bg-purple-950 hover:bg-purple-800 border border-neonCyan text-neonCyan font-bold w-7 h-7 rounded flex items-center justify-center text-xs active:scale-95" title="Decrease Bet">-</button>
+                        <button id="btn-bet-plus" class="bg-purple-950 hover:bg-purple-800 border border-neonCyan text-neonCyan font-bold w-7 h-7 rounded flex items-center justify-center text-xs active:scale-95" title="Increase Bet">+</button>
+                        <button id="btn-max-bet" class="bg-pink-950 hover:bg-pink-900 border border-neonPink text-neonPink text-[10px] font-bold px-1.5 h-7 rounded active:scale-95" title="Max Bet">MAX</button>
+                        <button id="btn-mute" class="bg-gray-900 hover:bg-gray-800 border border-gray-600 text-gray-200 w-7 h-7 rounded flex items-center justify-center text-xs ml-1" title="Mute/Unmute">🔊</button>
+                        <button id="btn-workshop" class="bg-gray-900 hover:bg-gray-800 border border-neonYellow text-neonYellow w-7 h-7 rounded flex items-center justify-center text-xs" title="Open Symbol Workshop">⚙️</button>
+                        <button id="btn-menu" class="bg-gray-900 hover:bg-gray-800 border border-gray-600 text-gray-200 w-7 h-7 rounded flex items-center justify-center text-xs" title="Main Menu">🏠</button>
+                    </div>
+
+                </div>
+
+                <!-- 3. REALISTIC 5 REELS WINDOW (Clean & Unobstructed, No Title Overlay) -->
+                <div class="relative w-full bg-black rounded-2xl border-4 border-neonCyan p-2 shadow-[0_0_25px_#00f3ff,inset_0_0_30px_#000] overflow-hidden mb-4">
+                    
+                    <!-- Glass Inner Reflection Overlay -->
+                    <div class="absolute inset-0 glass-reflection z-30"></div>
+
+                    <!-- SVG Canvas overlay for connecting winning line renders -->
+                    <svg id="payline-canvas" class="absolute inset-0 w-full h-full z-20"></svg>
+
+                    <!-- REELS CONTAINER (5 REELS x 3 VISIBLE SYMBOLS) -->
+                    <div id="reels-grid" class="grid grid-cols-5 gap-1.5 sm:gap-2 relative z-10 h-[280px] sm:h-[320px]">
+                        
+                        <!-- Reel 1 -->
+                        <div class="reel-window rounded-lg border border-gray-800 relative shadow-inner">
+                            <div class="reel-strip flex flex-col items-center" id="reel-0"></div>
+                        </div>
+                        <!-- Reel 2 -->
+                        <div class="reel-window rounded-lg border border-gray-800 relative shadow-inner">
+                            <div class="reel-strip flex flex-col items-center" id="reel-1"></div>
+                        </div>
+                        <!-- Reel 3 -->
+                        <div class="reel-window rounded-lg border border-gray-800 relative shadow-inner">
+                            <div class="reel-strip flex flex-col items-center" id="reel-2"></div>
+                        </div>
+                        <!-- Reel 4 -->
+                        <div class="reel-window rounded-lg border border-gray-800 relative shadow-inner">
+                            <div class="reel-strip flex flex-col items-center" id="reel-3"></div>
+                        </div>
+                        <!-- Reel 5 -->
+                        <div class="reel-window rounded-lg border border-gray-800 relative shadow-inner">
+                            <div class="reel-strip flex flex-col items-center" id="reel-4"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 4. SPIN CONTROL DECK (Positioned Directly ABOVE Point Boxes) -->
+                <div class="w-full flex justify-center items-center my-2">
+                    <button id="btn-spin" class="spin-btn-neon w-full sm:w-3/4 py-3.5 sm:py-4 rounded-2xl text-2xl sm:text-3xl font-display font-black tracking-widest text-black uppercase cursor-pointer border-2 border-white">
+                        SPIN!
+                    </button>
+                </div>
+
+                <!-- 5. BOTTOM POINT BOXES (Beneath Spin Button) -->
+                <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+                    <div class="bg-gradient-to-b from-purple-950 to-black border-2 border-neonYellow rounded-xl p-2 text-center shadow-[0_0_10px_rgba(255,230,0,0.2)]">
+                        <div class="text-xs sm:text-sm font-black font-digital text-neonYellow">200,58</div>
+                        <div class="text-base sm:text-lg mt-0.5">☕ ☕ ☕</div>
+                    </div>
+
+                    <div class="bg-gradient-to-b from-purple-950 to-black border-2 border-neonPink rounded-xl p-2 text-center shadow-[0_0_10px_rgba(255,0,127,0.2)]">
+                        <div class="text-xs sm:text-sm font-black font-digital text-neonPink">1003,59</div>
+                        <div class="text-base sm:text-lg mt-0.5">🍩 🍩 🍩</div>
+                    </div>
+
+                    <div class="bg-gradient-to-b from-purple-950 to-black border-2 border-neonCyan rounded-xl p-2 text-center shadow-[0_0_10px_rgba(0,243,255,0.2)]">
+                        <div class="text-xs sm:text-sm font-black font-digital text-neonCyan">503,64</div>
+                        <div class="text-base sm:text-lg mt-0.5">🚀 🚀 🚀</div>
+                    </div>
+
+                    <div class="bg-gradient-to-b from-purple-950 to-black border-2 border-neonGreen rounded-xl p-2 text-center shadow-[0_0_10px_rgba(0,255,102,0.2)]">
+                        <div class="text-xs sm:text-sm font-black font-digital text-neonGreen">1503,59</div>
+                        <div class="text-base sm:text-lg mt-0.5">⭐ ⭐ ⭐</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PAYTABLE MINI FOOTER PREVIEW -->
+            <div class="w-full max-w-3xl mt-4 bg-black/80 border border-purple-900 rounded-xl p-3">
+                <h4 class="text-xs font-bold text-neonYellow tracking-wider uppercase mb-2">Symbol Paytable Preview</h4>
+                <div id="paytable-mini-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <!-- Dynamic Paytable items -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- WORKSHOP MODAL -->
+        <div id="workshop-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="cabinet-frame neon-border-cyan rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4 border-b border-purple-800 pb-2">
+                    <h2 class="text-xl font-bold text-neonCyan">EDITABLE SYMBOL WORKSHOP</h2>
+                    <button id="btn-workshop-close-top" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+                </div>
+                <p class="text-xs text-gray-300 mb-4">Modify symbol names, custom image URLs, or payout multipliers dynamically without rewriting code.</p>
+                
+                <div id="workshop-form-container" class="space-y-3 mb-6">
+                    <!-- Generated Symbol Editing Rows -->
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-purple-800 pt-3">
+                    <button id="btn-workshop-save" class="spin-btn-neon px-6 py-2 rounded-xl font-bold text-black text-sm">SAVE & APPLY</button>
+                    <button id="btn-workshop-close" class="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2 rounded-xl text-sm font-bold">CLOSE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COPYRIGHT FOOTER -->
+        <footer class="text-center text-[10px] sm:text-xs text-gray-500 my-4 px-2">
+            © Pixel Pop Games 2026 Donutland | The Donut Landers by Killer Art Media. <a href="http://www.TheDonutLanders.com" target="_blank" class="text-neonCyan hover:underline">www.TheDonutLanders.com</a>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        /**
+         * THE DONUT LANDERS: SUGAR RUSH - SLOT MACHINE ENGINE
+         */
+
+        // Default Config & Editable Workshop Symbols
+        let gameConfig = {
+            credits: 1000,
+            bet: 10,
+            win: 0,
+            level: 1,
+            maxLevel: 12,
+            muted: false,
+            symbols: [
+                { id: 'coffee', name: 'Super Coffee', payout: 5, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#ff007f"/><rect x="30" y="35" width="40" height="40" rx="8" fill="#ffffff"/><path d="M70 45 h10 a10 10 0 0 1 0 20 h-10" stroke="#ffffff" stroke-width="6" fill="none"/><path d="M38 25 Q 42 15 38 8 M50 25 Q 54 15 50 8 M62 25 Q 66 15 62 8" stroke="#ffe600" stroke-width="4" fill="none"/></svg>` },
+                { id: 'donut_glazed', name: 'Glazed Donut', payout: 10, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#e67e22"/><circle cx="50" cy="50" r="38" fill="#f39c12"/><path d="M50 12 C 70 12, 88 30, 88 50 C 88 65, 75 88, 50 88 C 25 88, 12 70, 12 50 Z" fill="#ff79c6"/><circle cx="50" cy="50" r="16" fill="#111122"/><circle cx="35" cy="30" r="3" fill="#fff"/><circle cx="65" cy="35" r="3" fill="#fff"/></svg>` },
+                { id: 'donut_choco', name: 'Choco Sprinkles', payout: 15, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#5c3d11"/><circle cx="50" cy="50" r="38" fill="#795548"/><path d="M50 15 C 75 15, 85 30, 85 50 C 85 70, 70 85, 50 85 C 30 85, 15 70, 15 50 Z" fill="#3e2723"/><circle cx="50" cy="50" r="16" fill="#111122"/><rect x="30" y="30" width="8" height="3" rx="1" fill="#ffe600" transform="rotate(20 30 30)"/><rect x="60" y="32" width="8" height="3" rx="1" fill="#00f3ff" transform="rotate(-30 60 32)"/><rect x="35" y="65" width="8" height="3" rx="1" fill="#ff007f" transform="rotate(45 35 65)"/><rect x="62" y="60" width="8" height="3" rx="1" fill="#00ff66" transform="rotate(-15 62 60)"/></svg>` },
+                { id: 'donut_berry', name: 'Berry Blast', payout: 20, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#8e44ad"/><circle cx="50" cy="50" r="38" fill="#9b59b6"/><path d="M50 12 C 75 12, 88 30, 88 50 C 88 75, 70 88, 50 88 C 25 88, 12 70, 12 50 Z" fill="#e056fd"/><circle cx="50" cy="50" r="16" fill="#111122"/><circle cx="30" cy="35" r="4" fill="#00f3ff"/><circle cx="68" cy="38" r="4" fill="#00f3ff"/><circle cx="45" cy="72" r="4" fill="#00f3ff"/></svg>` },
+                { id: 'lander_alpha', name: 'Lander Alpha', payout: 35, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#00f3ff"/><ellipse cx="50" cy="45" rx="30" ry="18" fill="#0f051d"/><ellipse cx="50" cy="42" rx="12" ry="12" fill="#ff007f"/><polygon points="25,50 15,75 35,75" fill="#ffffff"/><polygon points="75,50 65,75 85,75" fill="#ffffff"/><line x1="50" y1="60" x2="50" y2="78" stroke="#ffffff" stroke-width="4"/></svg>` },
+                { id: 'lander_beta', name: 'Lander Beta', payout: 50, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#9d00ff"/><polygon points="50,20 80,65 20,65" fill="#11052c"/><circle cx="50" cy="45" r="10" fill="#00f3ff"/><polygon points="30,65 20,82 40,82" fill="#ffffff"/><polygon points="70,65 60,82 80,82" fill="#ffffff"/></svg>` },
+                { id: 'sugar_wild', name: 'Sugar Rush Wild', payout: 100, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#ffe600"/><circle cx="50" cy="50" r="38" fill="#ff9900"/><text x="50" y="42" text-anchor="middle" fill="#111" font-family="Impact" font-size="20">SUGAR</text><text x="50" y="65" text-anchor="middle" fill="#ff007f" font-family="Impact" font-size="22">WILD</text></svg>` },
+                { id: 'jackpot_star', name: 'Donut Star', payout: 250, svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#00ff66"/><polygon points="50,10 63,35 90,38 70,57 75,85 50,72 25,85 30,57 10,38 37,35" fill="#ffe600" stroke="#ffffff" stroke-width="2"/></svg>` }
+            ]
+        };
+
+        // Web Audio Synthesizer
+        class AudioSynth {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+            }
+            playTone(freq, type, duration, gainVal = 0.1) {
+                if (gameConfig.muted || !this.ctx) return;
+                try {
+                    if (this.ctx.state === 'suspended') this.ctx.resume();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+            click() { this.playTone(800, 'sine', 0.05, 0.05); }
+            spin() { this.playTone(180, 'sawtooth', 0.1, 0.04); }
+            reelStop() { this.playTone(320, 'triangle', 0.12, 0.12); }
+            win() {
+                [523.25, 659.25, 783.99].forEach((f, i) => {
+                    setTimeout(() => this.playTone(f, 'sine', 0.15, 0.12), i * 100);
+                });
+            }
+            jackpot() {
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    setTimeout(() => this.playTone(f, 'square', 0.2, 0.2), i * 120);
+                });
+            }
+        }
+
+        const audio = new AudioSynth();
+
+        // State Tracking
+        let isSpinning = false;
+        let reelStripsData = [[], [], [], [], []]; // Hold actual active grid state (5 columns x 3 rows)
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            initSplash();
+            buildLevelGrid();
+            buildPaytablePreview();
+            populateInitialReels();
+            updateUI();
+
+            // Event Listeners
+            document.getElementById('btn-spin').addEventListener('click', handleSpinClick);
+            document.getElementById('btn-start-game').addEventListener('click', () => switchScreen('game'));
+            document.getElementById('btn-menu').addEventListener('click', () => switchScreen('menu'));
+            
+            document.getElementById('btn-bet-plus').addEventListener('click', () => {
+                audio.click();
+                if (gameConfig.bet < 500) gameConfig.bet += 10;
+                updateUI();
+            });
+
+            document.getElementById('btn-bet-minus').addEventListener('click', () => {
+                audio.click();
+                if (gameConfig.bet > 10) gameConfig.bet -= 10;
+                updateUI();
+            });
+
+            document.getElementById('btn-max-bet').addEventListener('click', () => {
+                audio.click();
+                gameConfig.bet = 100;
+                updateUI();
+            });
+
+            document.getElementById('btn-mute').addEventListener('click', () => {
+                gameConfig.muted = !gameConfig.muted;
+                document.getElementById('btn-mute').textContent = gameConfig.muted ? '🔇' : '🔊';
+            });
+
+            document.getElementById('btn-workshop').addEventListener('click', openWorkshop);
+            document.getElementById('btn-workshop-menu').addEventListener('click', openWorkshop);
+            document.getElementById('btn-workshop-close').addEventListener('click', closeWorkshop);
+            document.getElementById('btn-workshop-close-top').addEventListener('click', closeWorkshop);
+            document.getElementById('btn-workshop-save').addEventListener('click', saveWorkshop);
+        });
+
+        // 1. Splash Screen Logic
+        function initSplash() {
+            let progress = 0;
+            const bar = document.getElementById('loading-bar');
+            const status = document.getElementById('splash-status');
+            const messages = [
+                "Powering Neon Reels...",
+                "Calibrating Donut Landers...",
+                "Preparing 12 Arcade Levels...",
+                "Ready for Sugar Rush!"
+            ];
+
+            const timer = setInterval(() => {
+                progress += 4;
+                bar.style.width = progress + '%';
+                let idx = Math.floor((progress / 100) * messages.length);
+                if (idx >= messages.length) idx = messages.length - 1;
+                status.textContent = messages[idx];
+
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        document.getElementById('splash-screen').classList.add('hidden');
+                        switchScreen('menu');
+                    }, 400);
+                }
+            }, 50);
+        }
+
+        function switchScreen(screen) {
+            audio.click();
+            if (screen === 'menu') {
+                document.getElementById('main-menu-screen').classList.remove('hidden');
+                document.getElementById('game-screen').classList.add('hidden');
+            } else {
+                document.getElementById('main-menu-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+            }
+        }
+
+        // 2. Build Level Grid
+        function buildLevelGrid() {
+            const grid = document.getElementById('level-select-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= gameConfig.maxLevel; i++) {
+                const btn = document.createElement('button');
+                btn.className = `p-2.5 rounded-xl font-bold border transition-all ${i === gameConfig.level ? 'bg-neonPink border-white text-white shadow-[0_0_10px_#ff007f]' : 'bg-purple-950/60 border-purple-800 text-gray-300 hover:border-neonCyan'}`;
+                btn.textContent = `Lvl ${i}`;
+                btn.onclick = () => {
+                    audio.click();
+                    gameConfig.level = i;
+                    buildLevelGrid();
+                    updateUI();
+                };
+                grid.appendChild(btn);
+            }
+        }
+
+        // 3. Build Paytable Mini Display
+        function buildPaytablePreview() {
+            const grid = document.getElementById('paytable-mini-grid');
+            grid.innerHTML = '';
+            gameConfig.symbols.forEach(sym => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-2 bg-purple-950/50 p-1.5 rounded-lg border border-purple-900/60';
+                item.innerHTML = `
+                    <div class="w-6 h-6">${sym.svg}</div>
+                    <div class="truncate">
+                        <div class="font-bold text-[10px] text-gray-200 truncate">${sym.name}</div>
+                        <div class="text-[10px] text-neonYellow">${sym.payout}x</div>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // 4. Initial Reel Generation
+        function populateInitialReels() {
+            for (let r = 0; r < 5; r++) {
+                const strip = document.getElementById(`reel-${r}`);
+                strip.innerHTML = '';
+                reelStripsData[r] = [];
+                // Create 20 items per strip for spin effect
+                for (let i = 0; i < 20; i++) {
+                    const sym = getRandomSymbol();
+                    if (i < 3) reelStripsData[r].push(sym); // First 3 are active visible row
+                    const cell = createSymbolCell(sym);
+                    strip.appendChild(cell);
+                }
+            }
+        }
+
+        function createSymbolCell(sym) {
+            const div = document.createElement('div');
+            div.className = 'w-full h-[90px] sm:h-[100px] flex flex-col items-center justify-center p-1.5 shrink-0 border-b border-gray-100/10 bg-white';
+            div.innerHTML = `
+                <div class="w-12 h-12 sm:w-16 sm:h-16 drop-shadow">${sym.svg}</div>
+                <span class="text-[9px] font-bold text-gray-800 mt-0.5 truncate max-w-full">${sym.name}</span>
+            `;
+            return div;
+        }
+
+        function getRandomSymbol() {
+            return gameConfig.symbols[Math.floor(Math.random() * gameConfig.symbols.length)];
+        }
+
+        // 5. SPIN MECHANIC (Sequential Stopping Reel Effect)
+        function handleSpinClick() {
+            if (isSpinning) return;
+            if (gameConfig.credits < gameConfig.bet) {
+                alert("Not enough credits! Please adjust your bet.");
+                return;
+            }
+
+            audio.init();
+            audio.click();
+
+            // Deduct Bet & Reset
+            gameConfig.credits -= gameConfig.bet;
+            gameConfig.win = 0;
+            updateUI();
+            clearPaylines();
+
+            isSpinning = true;
+            document.getElementById('btn-spin').disabled = true;
+
+            const finalGrid = []; // Will store the 5 reels x 3 visible result symbols
+
+            // Execute rapid spin animation on each reel
+            for (let r = 0; r < 5; r++) {
+                const strip = document.getElementById(`reel-${r}`);
+                
+                // Generate new final symbols for this reel (3 visible top symbols)
+                const reelResult = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+                finalGrid.push(reelResult);
+
+                // Build a new sequence strip (30 random symbols + target 3 at top)
+                strip.innerHTML = '';
+                reelResult.forEach(sym => strip.appendChild(createSymbolCell(sym)));
+                for (let i = 0; i < 25; i++) {
+                    strip.appendChild(createSymbolCell(getRandomSymbol()));
+                }
+
+                // Reset position to bottom
+                strip.style.transition = 'none';
+                strip.style.transform = 'translateY(-2200px)';
+
+                // Trigger rapid fast spin (10+ cycles), then stop sequentially left to right
+                const stopDelay = 1200 + (r * 400); // Reel 1 stops first, then Reel 2, 3, 4, 5
+
+                setTimeout(() => {
+                    // Fast spin sound tick
+                    audio.spin();
+                    // Smooth bounce transition to stop at top (0px)
+                    strip.style.transition = 'transform 0.8s cubic-bezier(0.1, 0.9, 0.2, 1.05)';
+                    strip.style.transform = 'translateY(0px)';
+
+                    // Reel stop audio and tactile effect
+                    setTimeout(() => {
+                        audio.reelStop();
+                        if (r === 4) {
+                            // All 5 Reels stopped completely
+                            reelStripsData = finalGrid;
+                            evaluateWinningPaylines(finalGrid);
+                            isSpinning = false;
+                            document.getElementById('btn-spin').disabled = false;
+                        }
+                    }, 800);
+
+                }, stopDelay);
+            }
+        }
+
+        // 6. WIN EVALUATION & PAYLINE REVEAL
+        function evaluateWinningPaylines(grid) {
+            // Payline rules (Row index for each reel 0..4)
+            const paylines = [
+                { name: 'Top Horizontal', line: [0, 0, 0, 0, 0] },
+                { name: 'Middle Horizontal', line: [1, 1, 1, 1, 1] },
+                { name: 'Bottom Horizontal', line: [2, 2, 2, 2, 2] },
+                { name: 'V-Shape Diagonal', line: [0, 1, 2, 1, 0] },
+                { name: 'Inverted V Diagonal', line: [2, 1, 0, 1, 2] }
+            ];
+
+            let totalWin = 0;
+            const winningLinesToDraw = [];
+
+            paylines.forEach(p => {
+                const firstSym = grid[0][p.line[0]];
+                let matchCount = 1;
+
+                for (let r = 1; r < 5; r++) {
+                    const currentSym = grid[r][p.line[r]];
+                    if (currentSym.id === firstSym.id || currentSym.id === 'sugar_wild') {
+                        matchCount++;
+                    } else {
+                        break;
+                    }
+                }
+
+                // Minimum 3 matching symbols for payout
+                if (matchCount >= 3) {
+                    const lineWin = firstSym.payout * gameConfig.bet * (matchCount - 2);
+                    totalWin += lineWin;
+                    winningLinesToDraw.push({ line: p.line, count: matchCount });
+                }
+            });
+
+            if (totalWin > 0) {
+                gameConfig.win = totalWin;
+                gameConfig.credits += totalWin;
+
+                if (totalWin >= gameConfig.bet * 10) {
+                    audio.jackpot();
+                } else {
+                    audio.win();
+                }
+
+                // Highlight winning line across symbols
+                drawPaylines(winningLinesToDraw);
+            }
+
+            updateUI();
+        }
+
+        // 7. Render Glowing Neon Lines Across Symbols
+        function drawPaylines(winningLines) {
+            const svg = document.getElementById('payline-canvas');
+            svg.innerHTML = '';
+
+            winningLines.forEach(item => {
+                const points = [];
+                for (let r = 0; r < item.count; r++) {
+                    const row = item.line[r];
+                    // Calculate center coordinates for reel (r) and row (row)
+                    const x = (r * 20) + 10; // Percentage width
+                    const y = (row * 33.3) + 16.6; // Percentage height
+                    points.push(`${x}% ${y}%`);
+
+                    // Pulse symbol box
+                    const strip = document.getElementById(`reel-${r}`);
+                    if (strip && strip.children[row]) {
+                        strip.children[row].classList.add('winning-cell');
+                    }
+                }
+
+                // Draw SVG polyline
+                const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+                polyline.setAttribute('points', points.join(', '));
+                polyline.setAttribute('stroke', '#ffe600');
+                polyline.setAttribute('stroke-width', '6');
+                polyline.setAttribute('fill', 'none');
+                polyline.setAttribute('stroke-linecap', 'round');
+                polyline.setAttribute('filter', 'drop-shadow(0 0 10px #ff007f)');
+                svg.appendChild(polyline);
+            });
+        }
+
+        function clearPaylines() {
+            document.getElementById('payline-canvas').innerHTML = '';
+            document.querySelectorAll('.winning-cell').forEach(el => el.classList.remove('winning-cell'));
+        }
+
+        function updateUI() {
+            document.getElementById('ui-credits').textContent = gameConfig.credits;
+            document.getElementById('ui-win').textContent = gameConfig.win;
+            document.getElementById('ui-bet').textContent = gameConfig.bet;
+            document.getElementById('ui-level').textContent = gameConfig.level;
+        }
+
+        // 8. Editable Symbol Workshop Logic
+        function openWorkshop() {
+            audio.click();
+            const container = document.getElementById('workshop-form-container');
+            container.innerHTML = '';
+
+            gameConfig.symbols.forEach((sym, idx) => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-1 sm:grid-cols-3 gap-2 bg-purple-950/70 p-2.5 rounded-xl border border-purple-800 items-center';
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8">${sym.svg}</div>
+                        <input type="text" id="ws-name-${idx}" value="${sym.name}" class="bg-black/80 border border-purple-700 text-white text-xs rounded px-2 py-1 w-full font-bold" placeholder="Symbol Name">
+                    </div>
+                    <div>
+                        <input type="number" id="ws-payout-${idx}" value="${sym.payout}" class="bg-black/80 border border-purple-700 text-neonYellow text-xs rounded px-2 py-1 w-full font-bold" placeholder="Payout Multiplier">
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-gray-400">ID: ${sym.id}</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('workshop-modal').classList.remove('hidden');
+        }
+
+        function closeWorkshop() {
+            audio.click();
+            document.getElementById('workshop-modal').classList.add('hidden');
+        }
+
+        function saveWorkshop() {
+            audio.click();
+            gameConfig.symbols.forEach((sym, idx) => {
+                const nameInp = document.getElementById(`ws-name-${idx}`);
+                const payoutInp = document.getElementById(`ws-payout-${idx}`);
+                if (nameInp) sym.name = nameInp.value;
+                if (payoutInp) sym.payout = parseFloat(payoutInp.value) || sym.payout;
+            });
+
+            buildPaytablePreview();
+            populateInitialReels();
+            closeWorkshop();
+        }
+    </script>
+</body>
+</html>
