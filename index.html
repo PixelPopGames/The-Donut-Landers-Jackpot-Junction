@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Donut Landers: Sugar Rush</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 5-Second Startup Splash Screen -->
+        <div id="splash-screen" class="screen active">
+            <div class="splash-content">
+                <div class="splash-logo-box">
+                    <img src="assets/images/splash-logo.svg" alt="Donut Landers Splash Logo" id="splash-logo-img">
+                </div>
+                <h1>The Donut Landers</h1>
+                <h2>Sugar Rush</h2>
+                <div class="loading-bar-container">
+                    <div id="loading-bar"></div>
+                </div>
+                <p id="splash-status">Initializing Sugar Core...</p>
+            </div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="main-menu-screen" class="screen">
+            <div class="menu-container">
+                <div class="logo-banner">
+                    <img src="assets/images/logo.svg" alt="The Donut Landers Logo" id="main-logo-img">
+                </div>
+                <div class="menu-box">
+                    <h3>Select Level (1 - 12)</h3>
+                    <div id="level-select-grid"></div>
+                    <div class="menu-actions">
+                        <button id="btn-start-game" class="primary-btn">Start Sugar Rush</button>
+                        <button id="btn-workshop" class="secondary-btn">Symbol Workshop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- Compact Modern Digital Top Score Board -->
+            <header class="compact-score-board">
+                <div class="compact-logo">
+                    <img src="assets/images/logo.svg" alt="Logo">
+                </div>
+                <div class="compact-stats">
+                    <div class="stat-pill">
+                        <span class="pill-label">CREDITO</span>
+                        <span class="pill-val led-cyan" id="ui-credits">58735</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="pill-label">PRÊMIO</span>
+                        <span class="pill-val led-gold" id="ui-win">0</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="pill-label">APOSTA</span>
+                        <span class="pill-val led-magenta" id="ui-bet">1200</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="pill-label">LEVEL</span>
+                        <span class="pill-val led-lime" id="ui-level">1</span>
+                    </div>
+                </div>
+                <div class="compact-actions">
+                    <button id="btn-bet-minus" class="mini-btn">-</button>
+                    <button id="btn-bet-plus" class="mini-btn">+</button>
+                    <button id="btn-max-bet" class="mini-btn max-btn">MAX</button>
+                    <button id="btn-mute" class="mini-icon-btn" title="Toggle Audio">🔊</button>
+                    <button id="btn-menu" class="mini-icon-btn" title="Main Menu">🏠</button>
+                </div>
+            </header>
+
+            <main class="game-main">
+                <!-- Physical Slot Machine Cabinet Body -->
+                <div class="neon-cabinet">
+                    <!-- Top Flashing Neon Light Strip -->
+                    <div class="flashing-neon-marquee">
+                        <span class="neon-bulb red"></span>
+                        <span class="neon-bulb yellow"></span>
+                        <span class="neon-bulb green"></span>
+                        <span class="neon-bulb cyan"></span>
+                        <span class="neon-bulb magenta"></span>
+                        <span class="neon-text-glow">SUGAR RUSH CABIN</span>
+                        <span class="neon-bulb magenta"></span>
+                        <span class="neon-bulb cyan"></span>
+                        <span class="neon-bulb green"></span>
+                        <span class="neon-bulb yellow"></span>
+                        <span class="neon-bulb red"></span>
+                    </div>
+
+                    <!-- 5 Reels Spinner Viewport -->
+                    <div id="slot-reels-container">
+                        <div class="reel" data-reel="0"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="1"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="2"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="3"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="4"><div class="reel-strip"></div></div>
+                        <!-- Canvas overlay for winning payline draws -->
+                        <canvas id="payline-canvas"></canvas>
+                    </div>
+
+                    <!-- SPIN BUTTON LOCATED DIRECTLY ABOVE THE 4 POINT SYSTEM BOXES -->
+                    <div class="mid-control-deck">
+                        <button id="btn-spin" class="big-neon-spin-btn">
+                            <span class="spin-glow"></span>
+                            <span class="spin-text">SPIN</span>
+                        </button>
+                    </div>
+
+                    <!-- Four Point System Boxes at the Bottom -->
+                    <div class="bottom-point-boxes">
+                        <div class="point-box">
+                            <div class="point-val">200,58</div>
+                            <div class="point-icons">☕☕☕</div>
+                        </div>
+                        <div class="point-box">
+                            <div class="point-val">1003,59</div>
+                            <div class="point-icons">🍩🍩🍩</div>
+                        </div>
+                        <div class="point-box">
+                            <div class="point-val">503,64</div>
+                            <div class="point-icons">🚀🚀🚀</div>
+                        </div>
+                        <div class="point-box highlight">
+                            <div class="point-val">1503,59</div>
+                            <div class="point-icons">⭐⭐⭐</div>
+                        </div>
+                    </div>
+
+                    <!-- Flashing Win Announcement Overlay -->
+                    <div id="win-announcer" class="hidden">
+                        <span id="win-text">WIN! 5000</span>
+                    </div>
+                </div>
+
+                <!-- Paytable Preview -->
+                <div class="paytable-preview">
+                    <h4>Paytable & Symbols</h4>
+                    <div id="paytable-grid"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Symbol Workshop Modal -->
+        <div id="workshop-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Symbol & Asset Workshop</h2>
+                <p>Customize symbol names, values, and image paths dynamically.</p>
+                <div id="workshop-form-container"></div>
+                <div class="modal-actions">
+                    <button id="btn-workshop-save" class="primary-btn">Save & Apply</button>
+                    <button id="btn-workshop-close" class="secondary-btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© Pixel Pop Games 2026 Donutland | The Donut Landers by Killer Art Media. www.TheDonutLanders.com</p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

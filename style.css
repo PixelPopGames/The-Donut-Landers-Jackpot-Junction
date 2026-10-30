@@ -1,0 +1,654 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+}
+
+body {
+    background: radial-gradient(circle at center, #1c093a 0%, #05020c 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+#app {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Startup Splash Screen */
+#splash-screen {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.splash-content {
+    background: rgba(20, 10, 40, 0.9);
+    padding: 40px;
+    border-radius: 20px;
+    border: 3px solid #ff00ff;
+    box-shadow: 0 0 40px #ff00ff, inset 0 0 20px #00ffff;
+    max-width: 500px;
+    width: 100%;
+}
+
+.splash-logo-box img {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 20px;
+}
+
+.splash-content h1 {
+    font-size: 2.2rem;
+    color: #ff69b4;
+    text-shadow: 0 0 15px #ff69b4;
+}
+
+.splash-content h2 {
+    font-size: 1.5rem;
+    color: #00ffff;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 14px;
+    background: #000;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 2px solid #00ffff;
+    margin-bottom: 15px;
+}
+
+#loading-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff00ff, #00ffff, #ffcc00);
+    transition: width 0.1s linear;
+}
+
+#splash-status {
+    font-size: 0.9rem;
+    color: #00ffff;
+    font-weight: bold;
+}
+
+/* Main Menu */
+#main-menu-screen {
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-container {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.logo-banner img {
+    width: 100%;
+    max-width: 550px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px #ff00ff);
+}
+
+.menu-box {
+    background: rgba(25, 10, 50, 0.95);
+    border: 3px solid #00ffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 30px #00ffff, inset 0 0 20px #ff00ff;
+}
+
+.menu-box h3 {
+    margin-bottom: 20px;
+    color: #ffcc00;
+    font-size: 1.3rem;
+    text-shadow: 0 0 8px #ffcc00;
+}
+
+#level-select-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.level-btn {
+    background: linear-gradient(145deg, #2b1454, #12072b);
+    border: 2px solid #ff00ff;
+    color: #fff;
+    padding: 12px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+}
+
+.level-btn:hover, .level-btn.selected {
+    background: linear-gradient(145deg, #ff00ff, #ff1493);
+    border-color: #00ffff;
+    box-shadow: 0 0 15px #ff00ff;
+    transform: translateY(-2px);
+}
+
+.menu-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.primary-btn, .secondary-btn {
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    border-radius: 30px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #ff007f, #ff00ff);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+}
+
+.secondary-btn {
+    background: linear-gradient(135deg, #00ffff, #0088ff);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+/* COMPACT TOP SCORE BOARD */
+.compact-score-board {
+    background: linear-gradient(180deg, #100524 0%, #05020c 100%);
+    border: 2px solid #ff00ff;
+    border-radius: 14px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.compact-logo img {
+    height: 38px;
+    width: auto;
+    filter: drop-shadow(0 0 8px #00ffff);
+}
+
+.compact-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.stat-pill {
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 4px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 85px;
+    box-shadow: inset 0 0 8px #000;
+}
+
+.pill-label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+.pill-val {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    font-size: 1.15rem;
+}
+
+.led-cyan { color: #00ffff; text-shadow: 0 0 8px #00ffff; }
+.led-gold { color: #ffcc00; text-shadow: 0 0 8px #ffcc00; }
+.led-magenta { color: #ff00ff; text-shadow: 0 0 8px #ff00ff; }
+.led-lime { color: #00ff66; text-shadow: 0 0 8px #00ff66; }
+
+.compact-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mini-btn {
+    background: linear-gradient(180deg, #331554 0%, #1a0930 100%);
+    border: 1px solid #ff00ff;
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.mini-btn:hover {
+    background: #ff00ff;
+    color: #000;
+}
+
+.max-btn {
+    border-color: #ffcc00;
+    color: #ffcc00;
+}
+
+.mini-icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* REALISTIC NEON SLOT MACHINE CABINET */
+.game-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.neon-cabinet {
+    position: relative;
+    background: linear-gradient(180deg, #2a1147 0%, #110524 50%, #080214 100%);
+    border: 5px solid #00ffff;
+    border-radius: 24px;
+    padding: 18px;
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.9);
+    width: 100%;
+    max-width: 880px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Flashing Neon Marquee Bulbs */
+.flashing-neon-marquee {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+    background: #000;
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 2px solid #ff00ff;
+}
+
+.neon-bulb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+    animation: bulbFlash 0.8s infinite alternate;
+}
+
+.neon-bulb.red { color: #ff0055; background: #ff0055; animation-delay: 0.1s; }
+.neon-bulb.yellow { color: #ffcc00; background: #ffcc00; animation-delay: 0.3s; }
+.neon-bulb.green { color: #00ff66; background: #00ff66; animation-delay: 0.5s; }
+.neon-bulb.cyan { color: #00ffff; background: #00ffff; animation-delay: 0.7s; }
+.neon-bulb.magenta { color: #ff00ff; background: #ff00ff; animation-delay: 0.9s; }
+
+@keyframes bulbFlash {
+    0% { opacity: 0.2; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.25); }
+}
+
+.neon-text-glow {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #ffcc00;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff0055;
+}
+
+/* 5 Reels Glass Window with 3D Bevel & Shadows */
+#slot-reels-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    background: #000;
+    padding: 8px;
+    border-radius: 14px;
+    border: 4px solid #ffcc00;
+    box-shadow: inset 0 0 25px rgba(0,0,0,1), 0 0 20px rgba(255, 204, 0, 0.5);
+    position: relative;
+    height: 380px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.reel {
+    background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 50%, #e0e0e0 100%);
+    border-right: 2px solid #111;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: inset 0 15px 15px rgba(0,0,0,0.4), inset 0 -15px 15px rgba(0,0,0,0.4);
+}
+
+.reel:last-child {
+    border-right: none;
+}
+
+.reel-strip {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.slot-symbol {
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-bottom: 1px dashed #ccc;
+    background: #ffffff;
+}
+
+.slot-symbol img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
+.slot-symbol span {
+    font-size: 0.72rem;
+    color: #111;
+    margin-top: 4px;
+    font-weight: 800;
+}
+
+#payline-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* SPIN BUTTON CONTROL DECK - PLACED DIRECTLY ABOVE THE 4 POINT BOXES */
+.mid-control-deck {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+    margin-bottom: 12px;
+}
+
+.big-neon-spin-btn {
+    position: relative;
+    background: linear-gradient(135deg, #00ffcc 0%, #0099ff 50%, #0044ff 100%);
+    border: 3px solid #ffffff;
+    border-radius: 50px;
+    padding: 16px 80px;
+    cursor: pointer;
+    box-shadow: 0 0 30px #00ffcc, 0 8px 0 #0033aa, inset 0 2px 5px #fff;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.big-neon-spin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 45px #00ffcc, 0 10px 0 #0033aa;
+}
+
+.big-neon-spin-btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 20px #00ffcc, 0 2px 0 #0033aa;
+}
+
+.spin-text {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #05020c;
+    letter-spacing: 3px;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+/* FOUR POINT SYSTEM BOXES AT THE BOTTOM */
+.bottom-point-boxes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%;
+}
+
+.point-box {
+    background: linear-gradient(180deg, #7a0000 0%, #3d0000 100%);
+    border: 2px solid #ffcc00;
+    border-radius: 10px;
+    padding: 8px;
+    text-align: center;
+    box-shadow: inset 0 0 12px #000, 0 0 10px rgba(255, 0, 0, 0.4);
+}
+
+.point-box.highlight {
+    background: linear-gradient(180deg, #a00040 0%, #500020 100%);
+    border-color: #00ffff;
+    box-shadow: inset 0 0 12px #000, 0 0 15px #00ffff;
+}
+
+.point-val {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    font-size: 1.25rem;
+    color: #ffffff;
+    text-shadow: 0 0 8px #ffcc00, 0 0 15px #ff0000;
+}
+
+.point-icons {
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+/* Win Announcer Text Banner */
+#win-announcer {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.85);
+    border: 4px solid #ff00ff;
+    border-radius: 20px;
+    padding: 20px 40px;
+    box-shadow: 0 0 50px #ff00ff, 0 0 100px #00ffff;
+    z-index: 20;
+    pointer-events: none;
+    text-align: center;
+}
+
+#win-announcer.hidden {
+    display: none;
+}
+
+#win-text {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #ffcc00;
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff0055;
+    animation: flashWin 0.4s infinite alternate;
+}
+
+@keyframes flashWin {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Paytable Preview */
+.paytable-preview {
+    width: 100%;
+    max-width: 880px;
+    background: rgba(15, 5, 30, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 12px 20px;
+}
+
+.paytable-preview h4 {
+    color: #ff69b4;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+#paytable-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.paytable-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.paytable-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #15062b;
+    border: 3px solid #ff00ff;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 650px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 0 40px #ff00ff;
+}
+
+.modal-content h2 {
+    color: #ff69b4;
+    margin-bottom: 8px;
+}
+
+.modal-content p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+#workshop-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.workshop-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.workshop-row input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.75rem;
+    color: #888;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .compact-score-board {
+        flex-direction: column;
+        gap: 10px;
+    }
+    #level-select-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    #paytable-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .big-neon-spin-btn {
+        width: 100%;
+        padding: 14px 0;
+    }
+}
