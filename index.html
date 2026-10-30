@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Donut Landers: Sugar Rush</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 5-Second Startup Splash Screen -->
+        <div id="splash-screen" class="screen active">
+            <div class="splash-content">
+                <div class="splash-logo-box">
+                    <img src="assets/images/splash-logo.svg" alt="Donut Landers Splash Logo" id="splash-logo-img">
+                </div>
+                <h1>The Donut Landers</h1>
+                <h2>Sugar Rush</h2>
+                <div class="loading-bar-container">
+                    <div id="loading-bar"></div>
+                </div>
+                <p id="splash-status">Initializing Sugar Core...</p>
+            </div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="main-menu-screen" class="screen">
+            <div class="menu-container">
+                <div class="logo-banner">
+                    <img src="assets/images/logo.svg" alt="The Donut Landers Logo" id="main-logo-img">
+                </div>
+                <div class="menu-box">
+                    <h3>Select Level (1 - 12)</h3>
+                    <div id="level-select-grid"></div>
+                    <div class="menu-actions">
+                        <button id="btn-start-game" class="primary-btn">Start Sugar Rush</button>
+                        <button id="btn-workshop" class="secondary-btn">Symbol Workshop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- Top Cabinet Banner inspired by Classic Halloween Slot Layout -->
+            <header class="cabinet-top-banner">
+                <div class="logo-area">
+                    <img src="assets/images/logo.svg" alt="The Donut Landers Logo">
+                </div>
+                <div class="digital-displays">
+                    <div class="display-box">
+                        <span class="label">CREDITO</span>
+                        <div class="red-led" id="ui-credits">58735</div>
+                    </div>
+                    <div class="display-box">
+                        <span class="label">PRÊMIO</span>
+                        <div class="red-led" id="ui-win">0</div>
+                    </div>
+                    <div class="display-box">
+                        <span class="label">APOSTA</span>
+                        <div class="red-led" id="ui-bet">1200</div>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button id="btn-mute" class="icon-btn" title="Toggle Audio">🔊</button>
+                    <button id="btn-menu" class="icon-btn" title="Main Menu">🏠</button>
+                </div>
+            </header>
+
+            <main class="game-main">
+                <div class="slot-cabinet">
+                    <div class="cabinet-top-lights">
+                        <span class="light red"></span>
+                        <span class="light yellow"></span>
+                        <span class="light green"></span>
+                        <span class="light cyan"></span>
+                        <span class="light magenta"></span>
+                    </div>
+                    
+                    <div id="slot-reels-container">
+                        <!-- 5 Reels -->
+                        <div class="reel" data-reel="0"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="1"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="2"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="3"><div class="reel-strip"></div></div>
+                        <div class="reel" data-reel="4"><div class="reel-strip"></div></div>
+                        <div class="payline-overlay" id="payline-overlay"></div>
+                    </div>
+
+                    <!-- Jackpot Displays Bar (Bottom Cabinet Meter) -->
+                    <div class="bottom-jackpot-meters">
+                        <div class="meter-card">
+                            <div class="meter-val">200,58</div>
+                            <div class="meter-icons">☕☕☕</div>
+                        </div>
+                        <div class="meter-card">
+                            <div class="meter-val">1003,59</div>
+                            <div class="meter-icons">🍩🍩🍩</div>
+                        </div>
+                        <div class="meter-card">
+                            <div class="meter-val">503,64</div>
+                            <div class="meter-icons">🚀🚀🚀</div>
+                        </div>
+                        <div class="meter-card highlight">
+                            <div class="meter-val">1503,59</div>
+                            <div class="meter-icons">⭐⭐⭐</div>
+                        </div>
+                    </div>
+
+                    <div id="jackpot-banner" class="hidden">🎉 JACKPOT SUGAR RUSH! 🎉</div>
+                </div>
+
+                <div class="game-controls">
+                    <div class="bet-controls">
+                        <button id="btn-bet-minus" class="ctrl-btn">-</button>
+                        <span id="ui-bet-display">Bet: 10</span>
+                        <button id="btn-bet-plus" class="ctrl-btn">+</button>
+                        <button id="btn-max-bet" class="ctrl-btn">Max Bet</button>
+                    </div>
+                    <div class="level-indicator">Level: <strong id="ui-level">1</strong></div>
+                    <button id="btn-spin" class="spin-btn">SPIN</button>
+                </div>
+
+                <div class="paytable-preview">
+                    <h4>Paytable & Symbols</h4>
+                    <div id="paytable-grid"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Symbol Workshop Modal -->
+        <div id="workshop-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Symbol & Asset Workshop</h2>
+                <p>Customize symbol names, values, and image paths dynamically.</p>
+                <div id="workshop-form-container"></div>
+                <div class="modal-actions">
+                    <button id="btn-workshop-save" class="primary-btn">Save & Apply</button>
+                    <button id="btn-workshop-close" class="secondary-btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© Pixel Pop Games 2026 Donutland | The Donut Landers by Killer Art Media. www.TheDonutLanders.com</p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

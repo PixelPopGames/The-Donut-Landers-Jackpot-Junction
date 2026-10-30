@@ -1,0 +1,586 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+}
+
+body {
+    background: #080312;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+#app {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Splash Screen */
+#splash-screen {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.splash-content {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 105, 180, 0.3);
+    box-shadow: 0 0 30px rgba(255, 105, 180, 0.2);
+    max-width: 500px;
+    width: 100%;
+}
+
+.splash-logo-box img {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 20px;
+}
+
+.splash-content h1 {
+    font-size: 2.2rem;
+    color: #ff69b4;
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+.splash-content h2 {
+    font-size: 1.5rem;
+    color: #00ffff;
+    margin-bottom: 30px;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 15px;
+}
+
+#loading-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff69b4, #00ffff);
+    transition: width 0.1s linear;
+}
+
+#splash-status {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Main Menu */
+#main-menu-screen {
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-container {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.logo-banner img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.menu-box {
+    background: rgba(30, 15, 60, 0.85);
+    border: 3px solid #ff69b4;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 0 25px rgba(255, 105, 180, 0.3);
+}
+
+.menu-box h3 {
+    margin-bottom: 15px;
+    color: #00ffff;
+}
+
+#level-select-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.level-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 12px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.level-btn:hover, .level-btn.selected {
+    background: #ff69b4;
+    border-color: #fff;
+    box-shadow: 0 0 10px #ff69b4;
+}
+
+.menu-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.primary-btn, .secondary-btn {
+    padding: 14px 28px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #ff69b4, #ff1493);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+}
+
+.secondary-btn {
+    background: rgba(0, 255, 255, 0.2);
+    color: #00ffff;
+    border: 1px solid #00ffff;
+}
+
+/* Cabinet Top Banner - Styled like Halloween Cabinet Header */
+.cabinet-top-banner {
+    background: #000;
+    border: 3px solid #ff69b4;
+    border-radius: 12px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    box-shadow: inset 0 0 15px rgba(255, 105, 180, 0.3);
+}
+
+.cabinet-top-banner .logo-area img {
+    height: 50px;
+    width: auto;
+}
+
+.digital-displays {
+    display: flex;
+    gap: 20px;
+}
+
+.display-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.display-box .label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #ffcc00;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+}
+
+.red-led {
+    background: #400;
+    border: 2px solid #800;
+    border-radius: 6px;
+    color: #ff3333;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    font-size: 1.3rem;
+    padding: 4px 14px;
+    box-shadow: inset 0 0 8px #000, 0 0 8px rgba(255, 0, 0, 0.5);
+    text-shadow: 0 0 5px #ff0000;
+    min-width: 100px;
+    text-align: center;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Slot Cabinet Body */
+.game-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.slot-cabinet {
+    position: relative;
+    background: linear-gradient(145deg, #1b0c33, #090314);
+    border: 4px solid #ff69b4;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(255, 105, 180, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.8);
+    width: 100%;
+    max-width: 850px;
+}
+
+.cabinet-top-lights {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.light {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.light.red { background: #ff0055; color: #ff0055; }
+.light.yellow { background: #ffcc00; color: #ffcc00; }
+.light.green { background: #00ff66; color: #00ff66; }
+.light.cyan { background: #00ffff; color: #00ffff; }
+.light.magenta { background: #ff00ff; color: #ff00ff; }
+
+#slot-reels-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    background: #000;
+    padding: 8px;
+    border-radius: 8px;
+    border: 3px solid #ffcc00;
+    position: relative;
+    height: 380px;
+    overflow: hidden;
+}
+
+.reel {
+    background: #ffffff;
+    border-right: 2px solid #222;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
+.reel:last-child {
+    border-right: none;
+}
+
+.reel-strip {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.slot-symbol {
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    background: #fff;
+}
+
+.slot-symbol img {
+    width: 75px;
+    height: 75px;
+    object-fit: contain;
+}
+
+.slot-symbol span {
+    font-size: 0.7rem;
+    color: #333;
+    margin-top: 4px;
+    font-weight: bold;
+}
+
+/* Bottom Jackpot Display Boxes (Cabinet Meter Style) */
+.bottom-jackpot-meters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.meter-card {
+    background: linear-gradient(180deg, #800000 0%, #400000 100%);
+    border: 2px solid #ffcc00;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    box-shadow: inset 0 0 10px #000;
+}
+
+.meter-card.highlight {
+    background: linear-gradient(180deg, #a00000 0%, #600000 100%);
+    border-color: #00ffff;
+}
+
+.meter-val {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: #fff;
+    text-shadow: 0 0 5px #ffcc00;
+}
+
+.meter-icons {
+    font-size: 0.8rem;
+    margin-top: 2px;
+}
+
+#jackpot-banner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 20, 147, 0.95);
+    color: #fff;
+    padding: 15px 30px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-radius: 12px;
+    border: 3px solid #ffcc00;
+    box-shadow: 0 0 30px #ffcc00;
+    z-index: 10;
+    text-align: center;
+}
+
+/* Game Controls */
+.game-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 850px;
+    background: rgba(20, 10, 40, 0.9);
+    padding: 15px 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 105, 180, 0.4);
+}
+
+.bet-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ctrl-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#ui-bet-display {
+    font-weight: bold;
+    color: #00ffff;
+    font-size: 1.1rem;
+    min-width: 80px;
+    text-align: center;
+}
+
+.level-indicator {
+    font-size: 1.1rem;
+    color: #ff99cc;
+}
+
+.spin-btn {
+    background: linear-gradient(135deg, #00ffcc, #0099ff);
+    color: #0d061f;
+    font-size: 1.5rem;
+    font-weight: 900;
+    padding: 14px 50px;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(0, 255, 204, 0.5);
+}
+
+.paytable-preview {
+    width: 100%;
+    max-width: 850px;
+    background: rgba(20, 10, 40, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 20px;
+}
+
+.paytable-preview h4 {
+    color: #ff69b4;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+#paytable-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.paytable-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.paytable-item img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #190a33;
+    border: 2px solid #ff69b4;
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 650px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    color: #ff69b4;
+    margin-bottom: 8px;
+}
+
+.modal-content p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+#workshop-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.workshop-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.workshop-row input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.75rem;
+    color: #888;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .cabinet-top-banner {
+        flex-direction: column;
+        gap: 10px;
+    }
+    #level-select-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    #paytable-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .game-controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .spin-btn {
+        width: 100%;
+    }
+}
